@@ -181,35 +181,33 @@ class Regmap(object):
 
 class Cmdfield(object):
     def dump_to_header(self, header):
-        if('CMD' not in self.name != 0):
-            header.file.write('(%-40s << 0x%x)' % (self.name.upper(), self.offset))
+        if('ARG' not in self.value != 0):
+            header.file.write('(0x%x << 0x%x)' % (int(self.value,0), self.offset))
+        else:
+            header.file.write('(%s << 0x%x)' % (self.name.lower(), self.offset))
 
 class Cmd(object):
     def dump_to_header(self, header):
         self.dump_cmdfield_to_header(header=header)
 
     def dump_cmdfield_to_header(self, header):
-        header.file.write('#define %s 0x%x\n' % (self.name.upper(), self.code))
-        header.file.write('#define %s_SETUP (' % self.name)
+        header.file.write('#define %s (' % self.name.upper())
         first = 1
         for name, cmdfield in self.fields.items():
-            if( first == 0 ):
+            if( first == 0 and ('ARG' in cmdfield.value)):
                 header.file.write(',')
-            if('CMD' not in cmdfield.name):
-                header.file.write('%s ' % cmdfield.name)
+            if('ARG' in cmdfield.value):
+                header.file.write('%s' % cmdfield.name.lower())
                 first = 0
-        header.file.write(')\\\n')
+        header.file.write(') ')
         
         header.file.write('(')
         first = 1
         for name, cmdfield in self.fields.items():
             if(first != 1):
-                header.file.write('| ')
+                header.file.write('|')
             first= 0 
             cmdfield.dump_to_header(header=header)
-            if('CMD' in cmdfield.name):
-                header.file.write('(%-40s << 0x%x)' % (self.name.upper(), cmdfield.offset))
-            header.file.write('\\\n')
         header.file.write(')\n')
 
 class Cmdmap(object):

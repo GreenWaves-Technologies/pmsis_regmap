@@ -86,14 +86,14 @@ def import_xls(regmap, cmdmap, path):
         for index, row in ipcmdmap.iterrows():
             cmd = cmdmap.get_command(row['Command name'])
 
-            if row['Bit Position'] == '-':
+            if row['Bit position'] == '-':
                 continue
 
             cmd.add_cmdfield(
                 cmap.Cmdfield(
-                    name=row['Parameter Bit field'],
+                    name=row['Parameter bit field'],
                     width=row['Size'],
-                    offset=int(row['Bit Position']),
+                    offset=int(row['Bit position']),
                     value=row['Field value'],
                     desc=row['Description'],
                 )
