@@ -123,16 +123,28 @@ class Register(object):
 
 class Regmap(object):
 
-    def dump_regfields_to_header(self, header):
+    def dump_regfields_to_header(self, header, udma_ip_type):
         header.file.write('\n/* ----------------------------------------------------------------------------\n')
         header.file.write('   -- %s Peripheral Access Layer --\n' % header.name.upper())
         header.file.write('   ---------------------------------------------------------------------------- */\n')
         header.file.write('\n/** %s_Type Register Layout Typedef */\n' % header.name.upper())
         header.file.write('typedef struct %s\n{\n' % header.name.lower())
 
+        elmt_count = 0
+        nb_channels = 0
+        if(udma_ip_type is not None):
+            if("CMD" in udma_ip_type):
+                nb_channels = 9
+                header.file.write('  udma_core_cmd_t %s; // core channels, cmd type\n' % (header.name.lower()))
+            else:
+                nb_channels = 6
+                header.file.write('  udma_core_t %s; // core channels, 2 channels type\n' % (header.name.lower()))
         for name, register in self.registers.items():
-            desc = '/**< %s */' % register.desc
-            header.file.write('  volatile uint32_t %s; %s\n' % (register.name.lower(), desc))
+            if(elmt_count < nb_channels):
+                elmt_count +=1
+            else:
+                desc = '/**< %s */' % register.desc
+                header.file.write('  volatile uint32_t %s; %s\n' % (register.name.lower(), desc))
 
         header.file.write('} __attribute__((packed)) %s_t;\n\n' % (header.name.lower()))
 
@@ -174,8 +186,8 @@ class Regmap(object):
         for name, constant in self.constants.items():
             constant.dump_to_header(header=header)
 
-    def dump_to_header(self, header):
-        self.dump_regfields_to_header(header)
+    def dump_to_header(self, header, udma_ip_type):
+        self.dump_regfields_to_header(header, udma_ip_type)
         self.dump_groups_to_header(header)
         self.dump_constants_to_header(header)
 
@@ -221,8 +233,8 @@ class Cmdmap(object):
     def dump_to_header(self, header):
         self.dump_cmd_to_header(header)
 
-def dump_to_header(regmap, cmdmap, name, header_path):
+def dump_to_header(regmap, cmdmap, name, header_path, udma_ip_type):
     header_file = Header(name, header_path)
-    regmap.dump_to_header(header_file)
+    regmap.dump_to_header(header_file, udma_ip_type)
     cmdmap.dump_to_header(header_file)
     header_file.close(header_path)
