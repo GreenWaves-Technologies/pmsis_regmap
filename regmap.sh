@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [[ $# -ne 3 ]]
+if [[ $# -lt 3 ]]
 then
     echo "Needs 3 args !"
     echo "regmap.sh xls_file ip_name filename"
@@ -12,5 +12,5 @@ NAME="$2"
 HEADER="$(basename "$3")"
 DEST="$( cd "$(dirname "$3")" ; pwd -P )"
 
-~/.bin/regmap/regmap --input-xls $XLS --name $NAME --header $HEADER
+./regmap --input-xls $XLS --name $NAME --header $HEADER $@
 mv $HEADER $DEST > 2 >& /dev/null

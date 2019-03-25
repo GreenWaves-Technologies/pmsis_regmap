@@ -101,6 +101,7 @@ class Register(object):
             field.dump_macros(header, reg_name)
     
     def dump_struct(self, header):
+        header.file.write('\n/*! @name %s_%s_t */\n' % ( header.name, self.name.lower()))
         header.file.write('\n')
         header.file.write('typedef union {\n')
         header.file.write('  struct {\n')
@@ -153,8 +154,8 @@ class Regmap(object):
         header.file.write('   ---------------------------------------------------------------------------- */\n')
 
         for name, register in self.registers.items():
-            register.dump_fields_to_header(header=header)
             register.dump_struct(header=header)
+            register.dump_fields_to_header(header=header)
 
     def dump_groups_to_header(self, header):
         for name, group in self.regmaps.items():
@@ -187,6 +188,11 @@ class Regmap(object):
             constant.dump_to_header(header=header)
 
     def dump_to_header(self, header, udma_ip_type):
+        if(udma_ip_type is not None):
+            if('CMD' in udma_ip_type):
+                header.file.write('#include \"udma_core_cmd.h\"')
+            else:
+                header.file.write('#include \"udma_core.h\"')
         self.dump_regfields_to_header(header, udma_ip_type)
         self.dump_groups_to_header(header)
         self.dump_constants_to_header(header)
