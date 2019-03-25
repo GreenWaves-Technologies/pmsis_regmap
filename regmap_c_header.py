@@ -133,19 +133,29 @@ class Regmap(object):
 
         elmt_count = 0
         nb_channels = 0
+        channel_reg_nb = 4
+
+        current_index = 0
+        current_pad = 0
         if(udma_ip_type is not None):
             if("CMD" in udma_ip_type):
-                nb_channels = 9
+                nb_channels = 3*channel_reg_nb
                 header.file.write('  udma_core_cmd_t %s; // core channels, cmd type\n' % (header.name.lower()))
             else:
-                nb_channels = 6
+                nb_channels = 2*channel_reg_nb
                 header.file.write('  udma_core_t %s; // core channels, 2 channels type\n' % (header.name.lower()))
         for name, register in self.registers.items():
             if(elmt_count < nb_channels):
                 elmt_count +=1
+                current_index +=32
             else:
-                desc = '/**< %s */' % register.desc
-                header.file.write('  volatile uint32_t %s; %s\n' % (register.name.lower(), desc))
+                if(current_index < register.offset):
+                    header.file.write('  unsigned int padding%d:%-2d;\n' % (current_pad, register.offset - current_index))
+                    current_pad += 1;
+                else:
+                    desc = '/**< %s */' % register.desc
+                    header.file.write('  volatile uint32_t %s; %s\n' % (register.name.lower(), desc))
+                    current_index+=32
 
         header.file.write('} __attribute__((packed)) %s_t;\n\n' % (header.name.lower()))
 
