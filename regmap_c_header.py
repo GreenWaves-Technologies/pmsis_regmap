@@ -200,9 +200,9 @@ class Regmap(object):
     def dump_to_header(self, header, udma_ip_type):
         if(udma_ip_type is not None):
             if('CMD' in udma_ip_type):
-                header.file.write('#include \"udma_core_cmd.h\"')
+                header.file.write('#include \"udma_core_cmd_periph.h\"')
             else:
-                header.file.write('#include \"udma_core.h\"')
+                header.file.write('#include \"udma_core_periph.h\"')
         self.dump_regfields_to_header(header, udma_ip_type)
         self.dump_groups_to_header(header)
         self.dump_constants_to_header(header)
