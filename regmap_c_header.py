@@ -209,7 +209,7 @@ class Regmap(object):
 
 class Cmdfield(object):
     def dump_to_header(self, header):
-        if('ARG' not in self.value != 0):
+        if('ARG' not in self.value):
             header.file.write('(0x%x << 0x%x)' % (int(self.value,0), self.offset))
         else:
             header.file.write('(%s << 0x%x)' % (self.name.lower(), self.offset))
