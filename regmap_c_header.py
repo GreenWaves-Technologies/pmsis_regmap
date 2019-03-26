@@ -219,7 +219,7 @@ class Cmd(object):
         self.dump_cmdfield_to_header(header=header)
 
     def dump_cmdfield_to_header(self, header):
-        header.file.write('#define %s (' % self.name.upper())
+        header.file.write('#define %s_%s(' % (header.name.upper(),self.name.upper()))
         first = 1
         for name, cmdfield in self.fields.items():
             if( first == 0 and ('ARG' in cmdfield.value)):
